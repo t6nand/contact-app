@@ -1,0 +1,20 @@
+{
+  "name": "contact-app",
+  "version": "0.0.1",
+  "description": "This project aims to develop a web app that can send an OTP (via SMS) to a list of contacts, one at a time.",
+  "main": "OTPserver.js",
+  "author": "Tapan Sharma",
+  "dependencies": {
+    "body-parser":"latest",
+    "bunyan":"latest",
+    "ejs":"latest",
+    "express":"latest",
+    "morgan":"latest",
+    "request":"latest",
+    "twilio":"latest",
+    "url":"latest"
+  },
+  "scripts": { 
+    "start" : "node app/controller/otpserver.js"
+  }
+}
