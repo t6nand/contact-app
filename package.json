@@ -15,6 +15,6 @@
     "url":"latest"
   },
   "scripts": { 
-    "start" : "node app/controller/otpserver.js"
+    "start" : "node app/otpserver.js"
   }
 }

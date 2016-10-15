@@ -4,11 +4,11 @@ var ejs = require('ejs');
 var path = require('path');
 var app = express();
 
-var contactList = require(__dirname + '/../statics/contactlist.json');
-var fetchDetails = require(__dirname + '/../utils/fetchdetails.js');
-var logger = require(__dirname + '/../logger/jsLogger.js');
-var otpManagerPath = __dirname + '/../messageStatus/status.json';
-var sendOTP = require(__dirname +'/../managers/otpmanager.js');
+var contactList = require(__dirname + '/statics/contactlist.json');
+var fetchDetails = require(__dirname + '/utils/fetchdetails.js');
+var logger = require(__dirname + '/logger/jsLogger.js');
+var otpManagerPath = __dirname + '/messageStatus/status.json';
+var sendOTP = require(__dirname +'/managers/otpmanager.js');
 var sentOTP = require(otpManagerPath);
 
 process.setMaxListeners(0);
