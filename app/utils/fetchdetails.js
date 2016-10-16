@@ -18,7 +18,9 @@ module.exports = {
 		        }
 		        if(nameError || contactError) {
 		        	error = {};
+		        	error["name"] = obj.Name + " " + obj.Surname;
 		        	error["nameError"] = nameError;
+		        	error["contact"] = obj.Contact;
 		        	error["contactError"] = contactError;
 		        	throw new Error(JSON.stringify(error));
 		        } else {

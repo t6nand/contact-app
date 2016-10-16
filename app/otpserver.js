@@ -1,9 +1,16 @@
+/*
+    This server file handles all routing and control which component to show in view for a particular
+    action made in web. 
+*/
+
+// Native & 3rd party libraries.
 var bodyParser = require('body-parser');
 var express = require('express');
 var ejs = require('ejs');
 var path = require('path');
 var app = express();
 
+// Using resources from other modules, static files available locally
 var contactList = require(__dirname + '/statics/contactlist.json');
 var fetchDetails = require(__dirname + '/utils/fetchdetails.js');
 var logger = require(__dirname + '/logger/jsLogger.js');
@@ -26,11 +33,12 @@ app.get('/', function(req, res) {
 });
 
 // contact-list page 
-app.get('/send-otp.ejs', function(req, res) {
-    res.render('pages/send-otp', {contactList:contactList});
+app.get('/contact-list.ejs', function(req, res) {
+    res.render('pages/contact-list', {contactList:contactList});
 });
 
-// contact-info page
+// contact-info page. In event of input validation faliure, error page will be 
+// shown.
 app.get('/contact-info.ejs', function(req, res) {
     fetchDetails.getQueryFromURL(req.url, function(query) {
 	    try{
@@ -47,34 +55,49 @@ app.get('/contact-info.ejs', function(req, res) {
 	});
 });
 
-// message-compose page
+// message-compose page. In event of any error/exception, will be 
+// redirected to home page. 
 app.get('/message-compose.ejs', function(req, res) {
     var messageForContact = {};
-    fetchDetails.getQueryFromURL(req.url, function(query) {
-    	messageForContact["contact"] = query;
-    	fetchDetails.getRandomSixDigitNumber(function(random) {
-    		messageForContact["random"] = random;
-    		res.render('pages/message-compose', {messageForContact:messageForContact});
-    	});
-    });
+    try{
+        fetchDetails.getQueryFromURL(req.url, function(query) {
+        	messageForContact["contact"] = query;
+        	fetchDetails.getRandomSixDigitNumber(function(random) {
+        		messageForContact["random"] = random;
+        		res.render('pages/message-compose', {messageForContact:messageForContact});
+        	});
+        });
+    } catch(error) {
+        logger.error(error);
+        res.render('pages/index');
+    }
 });
 
+// Send message page. In event of any error, redirected to home page. 
 app.post('/send-otp', function(req, res) {
     var messageJson = {};
-    messageJson["contact"] = req.body.contact;
-    messageJson["text_message"] = req.body.text_message;
-    sendOTP.sendmessage(messageJson, function(data) {
-    	var message = {};
-    	if(!(data === "error")) {
-    		message["Status"] = "SUCCESS";
-    		res.render('pages/otp-confirmation', {message:message})
-    	} else {
-    		message["Status"] = "FAILURE";
-    		res.render('pages/otp-confirmation', {message:message})
-    	}
-    });
+    try{
+        messageJson["contact"] = req.body.contact;
+        messageJson["text_message"] = req.body.text_message;
+        sendOTP.sendmessage(messageJson, function(data) {
+        	var message = {};
+        	if(!(data === "error")) {
+        		message["Status"] = "SUCCESS";
+        		res.render('pages/otp-confirmation', {message:message})
+        	} else {
+        		message["Status"] = "FAILURE";
+        		res.render('pages/otp-confirmation', {message:message})
+        	}
+        });
+    }  catch(error) {
+        logger.error(error);
+        res.render('pages/index');
+    }   
 });
 
+// Page to list all sent OTPs. This implements hot loading of file.
+// This is achieved by clearing server cache for this file everytime
+// this route is hit. 
 app.get('/sent-otps.ejs', function(req, res) {
     delete require.cache[require.resolve(otpManagerPath)];
     sentOTP = require(otpManagerPath);
